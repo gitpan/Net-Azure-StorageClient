@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Net-Azure-StorageClient
-version:            0.2
+version:            0.3
 abstract:           Windows Azure Storage Client
 author:
     - Junnama Noda <junnama@alfasado.jp>
