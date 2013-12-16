@@ -3,7 +3,7 @@ use base qw/Net::Azure::StorageClient/;
 use strict;
 use warnings;
 {
-  $Net::Azure::StorageClient::Blob::VERSION = '0.91';
+  $Net::Azure::StorageClient::Blob::VERSION = '0.92';
 }
 use File::Spec;
 use XML::Simple;
@@ -351,7 +351,7 @@ sub download_blob {
 sub download {
     my $blobService = shift;
     my ( $path, $filename, $params ) = @_;
-    my $dir_info;
+    my $dir_info = '';
     if ( $params->{ directory } || $path =~ m!/$! ) {
         $dir_info = $blobService->_get_directory_info( $path, $filename, $params );
     }
@@ -512,7 +512,10 @@ sub upload_blob {
 sub upload {
     my $blobService = shift;
     my ( $path, $filename, $params ) = @_;
-    my $dir_info = $blobService->_get_directory_info( $path, $filename, $params );
+    my $dir_info = '';
+    if ( $params->{ directory } || $path =~ m!/$! ) {
+        $dir_info = $blobService->_get_directory_info( $path, $filename, $params );
+    }
     if ( $dir_info ) {
         # Upload files of directory
         my $excludes = $params->{ excludes } || $params->{ exclude };
@@ -773,6 +776,9 @@ sub remove {
     my $blobService = shift;
     my ( $path, $params ) = @_;
     $path = $blobService->_adjust_path( $path );
+    if ( $path =~ /\%/ ) {
+        $path = _encode_path( $path, '/' );
+    }
     if ( $path !~ m!/! ) {
         return $blobService->delete_container( $path, $params );
     }
